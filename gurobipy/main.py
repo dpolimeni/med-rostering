@@ -1,8 +1,15 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+
 from collections import defaultdict
-from gurobipy import Model, GRB, quicksum, tupledict
-from get_monthly_data import get_monthly_data
-from departments_data import ID_TO_WEEKDAY_NAME, SHIFT_NAMES
+
 from constraints import *
+from departments_data import ID_TO_WEEKDAY_NAME, SHIFT_NAMES
+
+from gurobipy import GRB, Model, quicksum, tupledict
+
+from get_monthly_data import get_monthly_data
 
 date = input("Enter the date: ")
 month = int(date.split("-")[1])
