@@ -8,7 +8,8 @@ from google.oauth2 import id_token as google_id_token
 
 from .mail_templates import RESET_PASSWORD
 from .schemas import UserLoginRegister, RequestPasswordReset, ResetPassword, GoogleLogin
-from .utils import PasswordHasher, TokenManager, EmailSender, send_verification_email
+from .utils import PasswordHasher, TokenManager
+from mail_service import EmailSender, send_verification_email
 from src.users.models import UserInDB
 from src.database.nosql.json_db import JsonDatabase
 from src.database.factory import get_session
