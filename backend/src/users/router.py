@@ -29,7 +29,7 @@ async def update_user(
 ):
     # If is another user trying to update the department check users are in the same specialization and the user is an admin
     if new_department.user_id != user.id:
-        if user.roles != ["admin"]:
+        if "admin" not in user.roles:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
         to_update_user = await database.get_user(new_department.user_id)
         if to_update_user.specialization != user.specialization:
@@ -52,7 +52,7 @@ async def assign_specialization(
     database: db_client,
     user: UserInDB = Depends(get_current_user),
 ):
-    if user.roles != ["admin"]:
+    if "admin" not in user.roles:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
     to_assign_user = await database.get_user(assign_request.user_mail)

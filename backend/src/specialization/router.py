@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from src.users.models import UserInDB
-from src.specialization.models import Specialization
-from src.database.factory import get_session
 from typing import Annotated
-from src.database.nosql.json_db import JsonDatabase
-from src.auth.utils import get_current_user
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from src.auth.utils import get_current_user
+from src.database.factory import get_session
+from src.database.nosql.json_db import JsonDatabase
+from src.specialization.models import Specialization
+from src.specialization.schemas import NewSpecialization
+from src.users.models import UserInDB
 
 router = APIRouter(prefix="/specializations", tags=["Specializations"])
 db_client = Annotated[JsonDatabase, Depends(get_session)]
@@ -24,4 +25,18 @@ async def get_specialization(
     if user.department not in specialization.departments:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
+    return specialization
+
+
+@router.post("/create", response_model=Specialization)
+async def create_specialization(
+    specialization: NewSpecialization,
+    database: db_client,
+    user: Annotated[UserInDB, Depends(get_current_user)],
+):
+    if "admin" not in user.roles:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+    specialization = Specialization(**specialization.model_dump())
+    await database.create_specialization(specialization)
     return specialization

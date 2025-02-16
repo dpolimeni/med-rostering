@@ -5,6 +5,9 @@ from fastapi import FastAPI, Depends, Request
 from src.users.models import UserInDB
 from src.auth.utils import get_current_user
 from src.auth.router import router as auth_router
+from src.users.router import router as users_router
+from src.specialization.router import router as specialization_router
+# from src.department.router import router as departments_router
 
 # from azure.monitor.opentelemetry import configure_azure_monitor
 from logging import Logger
@@ -59,6 +62,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(auth_router)
+app.include_router(users_router)
+app.include_router(specialization_router)
 
 app.add_middleware(
     CORSMiddleware,

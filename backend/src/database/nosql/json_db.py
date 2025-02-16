@@ -72,3 +72,10 @@ class JsonDatabase(BaseDatabase):
                 if specialization["id"] == specialization_id:
                     return Specialization(**specialization)
         return None
+    
+    async def create_specialization(self, specialization: Specialization):
+        if self.specialization_client is not None:
+            self.specialization_client.append(specialization.model_dump())
+            with open(self._specialization_collection, "w") as f:
+                json.dump(self.specialization_client, f)
+        return
