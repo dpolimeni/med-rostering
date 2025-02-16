@@ -1,5 +1,5 @@
 from src.database.base import BaseDatabase
-from src.database.models import UserInDB
+from src.users.models import UserInDB
 import os
 import json
 

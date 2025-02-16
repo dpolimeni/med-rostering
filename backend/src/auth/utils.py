@@ -6,9 +6,9 @@ import jwt
 from fastapi import Request, HTTPException, status
 from passlib.context import CryptContext
 from sendgrid import SendGridAPIClient, Mail
-from src.auth.templates import CONFIRM_REGISTRATION
+from backend.src.auth.mail_templates import CONFIRM_REGISTRATION
 from src.database.factory import get_session
-from src.database.models import UserInDB
+from src.users.models import UserInDB
 from src.settings import app_settings
 
 

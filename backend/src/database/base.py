@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from .models import UserInDB
+from src.users.models import UserInDB
 
 
 class BaseDatabase(ABC):

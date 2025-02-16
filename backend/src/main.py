@@ -2,11 +2,11 @@ from typing import Annotated
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Depends, Request
-from src.database.models import User
+from src.users.models import UserInDB
 from src.auth.utils import get_current_user
 from src.auth.router import router as auth_router
-from src.google_drive.router import router as google_drive_router
-from azure.monitor.opentelemetry import configure_azure_monitor
+
+# from azure.monitor.opentelemetry import configure_azure_monitor
 from logging import Logger
 
 
@@ -19,9 +19,10 @@ async def lifespan(app: FastAPI):
         # APPLICATIONINSIGHTS_CONNECTION_STRING environment variable.
         logger = logging.getLogger("custom_logger")  # Create a custom logger
         logger.setLevel(logging.DEBUG)
-        configure_azure_monitor(
-            connection_string="<your-connection-string>",
-        )
+        raise NotImplementedError("Azure Monitor is not yet supported")
+        # configure_azure_monitor(
+        #     connection_string="<your-connection-string>",
+        # )
     except Exception as e:
         import logging
 
@@ -58,7 +59,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(auth_router)
-app.include_router(google_drive_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -77,6 +77,6 @@ def read_root(request: Request):
 
 
 @app.get("/health")
-async def protected_api(user: Annotated[User, Depends(get_current_user)]):
+async def protected_api(user: Annotated[UserInDB, Depends(get_current_user)]):
     print(user)
     return {"message": "Hello, World!"}

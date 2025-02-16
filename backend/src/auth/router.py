@@ -6,10 +6,10 @@ from fastapi.responses import JSONResponse
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token as google_id_token
 
-from .templates import RESET_PASSWORD
+from .mail_templates import RESET_PASSWORD
 from .schemas import UserLoginRegister, RequestPasswordReset, ResetPassword, GoogleLogin
 from .utils import PasswordHasher, TokenManager, EmailSender, send_verification_email
-from src.database.models import UserInDB
+from src.users.models import UserInDB
 from src.database.nosql.json_db import JsonDatabase
 from src.database.factory import get_session
 from src.settings import app_settings
