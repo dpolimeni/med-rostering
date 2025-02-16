@@ -22,3 +22,7 @@ class BaseDatabase(ABC):
     @abstractmethod
     async def verify_user(self, user_mail: str):
         pass
+
+    @abstractmethod
+    async def get_specialization(self, specialization_id: str):
+        pass
