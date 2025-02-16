@@ -5,16 +5,16 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token as google_id_token
+from src.auth.services.mail import EmailSender, send_verification_email
+from src.auth.services.password import PasswordHasher
+from src.auth.services.token import TokenManager
+from src.database.factory import get_session
+from src.database.nosql.json_db import JsonDatabase
+from src.settings import app_settings
+from src.users.models import UserInDB
 
 from .mail_templates import RESET_PASSWORD
-from .schemas import UserLoginRegister, RequestPasswordReset, ResetPassword, GoogleLogin
-from .utils import PasswordHasher, TokenManager
-from mail_service import EmailSender, send_verification_email
-from src.users.models import UserInDB
-from src.database.nosql.json_db import JsonDatabase
-from src.database.factory import get_session
-from src.settings import app_settings
-
+from .schemas import GoogleLogin, RequestPasswordReset, ResetPassword, UserLoginRegister
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 db_client = Annotated[JsonDatabase, Depends(get_session)]
