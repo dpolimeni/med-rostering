@@ -16,7 +16,7 @@ from src.users.models import UserInDB
 from .mail_templates import RESET_PASSWORD
 from .schemas import GoogleLogin, RequestPasswordReset, ResetPassword, UserLoginRegister
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(prefix="/auth", tags=["Auth"])
 db_client = Annotated[JsonDatabase, Depends(get_session)]
 
 
