@@ -7,7 +7,7 @@ from src.database.nosql.json_db import JsonDatabase
 from src.users.models import UserInDB
 from src.users.schemas import AssignRequest, UpdateRequest, UserResponse
 
-router = APIRouter(prefix="/users", tags=["users"])
+router = APIRouter(prefix="/users", tags=["Users"])
 db_client = Annotated[JsonDatabase, Depends(get_session)]
 
 
@@ -66,6 +66,7 @@ async def assign_specialization(
     to_assign_user.department = assign_request.department
     await database.update_user(to_assign_user)
     return {"message": "User assigned"}
+
 
 # TODO
 # @router.delete("/delete")

@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+
+from src.department.models import Department
 from src.specialization.models import Specialization
 from src.users.models import UserInDB
 
@@ -30,4 +32,12 @@ class BaseDatabase(ABC):
 
     @abstractmethod
     async def create_specialization(self, specialization: Specialization):
+        pass
+
+    @abstractmethod
+    async def get_department(self, department_id: str):
+        pass
+    
+    @abstractmethod
+    async def create_department(self, department: Department):
         pass

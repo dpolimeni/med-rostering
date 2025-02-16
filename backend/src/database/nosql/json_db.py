@@ -1,8 +1,10 @@
-from src.database.base import BaseDatabase
-from src.users.models import UserInDB
-from src.specialization.models import Specialization
-import os
 import json
+import os
+
+from src.database.base import BaseDatabase
+from src.department.models import Department
+from src.specialization.models import Specialization
+from src.users.models import UserInDB
 
 
 class JsonDatabase(BaseDatabase):
@@ -14,9 +16,19 @@ class JsonDatabase(BaseDatabase):
         self._specialization_collection = os.path.join(
             base_path, "specialization_db.json"
         )
+        self._department_collection = os.path.join(base_path, "department_db.json")
         if not os.path.exists(self._users_collection):
             with open(self._users_collection, "w") as f:
                 f.write("[]")
+
+        if not os.path.exists(self._specialization_collection):
+            with open(self._specialization_collection, "w") as f:
+                f.write("[]")
+
+        if not os.path.exists(self._department_collection):
+            with open(self._department_collection, "w") as f:
+                f.write("[]")
+        return
 
     async def get_client(self):
         # Verify if the database file exists
@@ -27,6 +39,10 @@ class JsonDatabase(BaseDatabase):
         with open(self._specialization_collection, "r") as f:
             database = json.loads(f.read())
             self.specialization_client = database
+
+        with open(self._department_collection, "r") as f:
+            database = json.loads(f.read())
+            self.department_client = database
         return
 
     async def get_user(self, mail: str) -> UserInDB:
@@ -72,10 +88,24 @@ class JsonDatabase(BaseDatabase):
                 if specialization["id"] == specialization_id:
                     return Specialization(**specialization)
         return None
-    
+
     async def create_specialization(self, specialization: Specialization):
         if self.specialization_client is not None:
             self.specialization_client.append(specialization.model_dump())
             with open(self._specialization_collection, "w") as f:
                 json.dump(self.specialization_client, f)
+        return
+
+    async def get_department(self, department_id: str):
+        if self.department_client:
+            for department in self.department_client:
+                if department["id"] == department_id:
+                    return Department(**department)
+        return None
+
+    async def create_department(self, department: Department):
+        if self.department_client is not None:
+            self.department_client.append(department.model_dump())
+            with open(self._department_collection, "w") as f:
+                json.dump(self.department_client, f)
         return
