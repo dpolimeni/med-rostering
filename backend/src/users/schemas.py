@@ -11,6 +11,12 @@ class UserResponse(BaseModel):
         description="User department",
         examples=["Engineering", "Marketing"],
     )
+    specialization: Optional[str] = Field(
+        None,
+        title="User specialization",
+        description="User specialization",
+        examples=["Software Development", "Data Analysis"],
+    )
 
 
 class UpdateRequest(BaseModel):
