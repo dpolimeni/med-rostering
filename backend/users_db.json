@@ -1,0 +1,13 @@
+[
+    {
+        "id": "1fa581f9-16e4-41fe-95db-bf5490f1c73b",
+        "email": "diego@zendata.it",
+        "roles": [
+            "user"
+        ],
+        "register_status": "active",
+        "hashed_password": "$2b$12$TEsLsdQwC2.PDVYTVKGD/enasqMcns./I7EgQ0sjlVKgG/.311Pay",
+        "specialization": null,
+        "department": null
+    }
+]
