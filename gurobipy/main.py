@@ -29,23 +29,24 @@ idx_dow, dow_idxs = get_monthly_data(date)
 num_days = len(idx_dow)
 doctors = {
     # reparto_ostetricia
-    "r_ost_1": "reparto_ostetricia",
-    "r_ost_2": "reparto_ostetricia",
-    "r_ost_3": "reparto_ostetricia",
+    "alessia_berardi": "reparto_ostetricia",
+    "anna_romano": "reparto_ostetricia",
+    "virginia_magro": "reparto_ostetricia",
     # ambulatorio_ostetricia
-    "a_ost_1": "ambulatorio_ostetricia",
-    "a_ost_2": "ambulatorio_ostetricia",
+    "gregorio_volpe": "ambulatorio_ostetricia",
+    "alessia_antonacci": "ambulatorio_ostetricia",
     # day_hospital_ostetricia
-    "alessia": "day_hospital_ostetricia",
+    "lucrezia_lamorgese": "day_hospital_ostetricia",
     # reparto_ginecologia
-    "r_gine_1": "reparto_ginecologia",
-    "r_gine_2": "reparto_ginecologia",
+    "antonio_de_palma": "reparto_ginecologia",
+    "alessandra_ascani": "reparto_ginecologia",
     # ambulatorio_ginecologia
-    "a_gine_1": "ambulatorio_ginecologia",
-    "a_gine_2": "ambulatorio_ginecologia",
-    "a_gine_3": "ambulatorio_ginecologia",
+    "roberta_arseni": "ambulatorio_ginecologia",
+    "marica_di_viesti": "ambulatorio_ginecologia",
+    "simona_incamicia": "ambulatorio_ginecologia",
+    "flavia_denaro": "ambulatorio_ginecologia",
     # sala_operatoria
-    "sala_operatoria": "sala_operatoria",
+    "lucia_oliva": "sala_operatoria",
 }
 
 dperartments_doctors = defaultdict(list)
@@ -67,7 +68,9 @@ min_work_vars = model.addVars(
 # max_worker_vars =
 
 # Consecutive days constraint
-build_consecutive_shift_constraint(model, variables, list(doctors.keys()), num_days,  num_shifts=2, consecutive_limit=7)
+build_consecutive_shift_constraint(
+    model, variables, list(doctors.keys()), num_days, num_shifts=2, consecutive_limit=10
+)
 
 # Custom constraints None for now
 
