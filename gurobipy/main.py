@@ -67,7 +67,7 @@ min_work_vars = model.addVars(
 # max_worker_vars =
 
 # Consecutive days constraint
-build_consecutive_shift_constraint(model, variables, list(doctors.keys()), num_days)
+build_consecutive_shift_constraint(model, variables, list(doctors.keys()), num_days,  num_shifts=2, consecutive_limit=7)
 
 # Custom constraints None for now
 

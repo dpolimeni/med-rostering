@@ -4,7 +4,12 @@ from departments_data import departments_constraint
 
 
 def build_consecutive_shift_constraint(
-    model: Model, assignments_vars: tupledict, doctor_names: List[str], month_days: int
+    model: Model,
+    assignments_vars: tupledict,
+    doctor_names: List[str],
+    month_days: int,
+    num_shifts: int = 2,
+    consecutive_limit: int = 1,
 ) -> None:
     """Builds and Add the constraint to the model that no one can work two consecutive shifts
 
@@ -12,29 +17,54 @@ def build_consecutive_shift_constraint(
         model (Model): Gurobi model
         assignments_vars (tupledict): like (doctor_name, day, shift) -> binary_var
     """
-    # Iterate over doctors
+    # List of ordered variables per doctor
+    doctor_ordered_vars = {
+        doctor: [
+            ([doctor, day, shift], assignments_vars[doctor, day, shift])
+            for day in range(month_days)
+            for shift in range(num_shifts)
+        ]
+        for doctor in doctor_names
+    }
     for doctor in doctor_names:
-        for day in range(month_days):
-            # No consecutive shifts
+        for i in range(len(doctor_ordered_vars[doctor]) - consecutive_limit):
+            consecutive_vars = [
+                el[1]
+                for el in doctor_ordered_vars[doctor][i : i + consecutive_limit + 1]
+            ]
+            consecutive_names = [
+                el[0]
+                for el in doctor_ordered_vars[doctor][i : i + consecutive_limit + 1]
+            ]
             model.addConstr(
-                assignments_vars[doctor, day, 0] + assignments_vars[doctor, day, 1]
-                <= 1,
-                f"no_consecutive_{doctor}_{day}",
+                quicksum(consecutive_vars) <= 1,
+                f"no_consecutive_{consecutive_limit}_for_{consecutive_names[0]}_to_{consecutive_names[-1]}",
             )
-            if day != month_days - 1:
-                model.addConstr(
-                    assignments_vars[doctor, day, 1]
-                    + assignments_vars[doctor, day + 1, 0]
-                    <= 1,
-                    f"no_consecutive_{doctor}_{day}_night_{day + 1}_morning",
-                )
-                model.addConstr(
-                    assignments_vars[doctor, day, 1]
-                    + assignments_vars[doctor, day + 1, 0]
-                    + assignments_vars[doctor, day + 1, 1]
-                    <= 1,
-                    f"no_consecutive_{doctor}_{day}_night_{day + 1}_",
-                )
+
+    # Iterate over doctors
+    # for doctor in doctor_names:
+    #     for day in range(month_days):
+    #         for shift in range(num_shifts):
+    #             # No consecutive shifts
+    #             model.addConstr(
+    #                 assignments_vars[doctor, day, 0] + assignments_vars[doctor, day, 1]
+    #                 <= 1,
+    #                 f"no_consecutive_{doctor}_{day}",
+    #             )
+    #             if day != month_days - 1:
+    #                 model.addConstr(
+    #                     assignments_vars[doctor, day, 1]
+    #                     + assignments_vars[doctor, day + 1, 0]
+    #                     <= 1,
+    #                     f"no_consecutive_{doctor}_{day}_night_{day + 1}_morning",
+    #                 )
+    #                 model.addConstr(
+    #                     assignments_vars[doctor, day, 1]
+    #                     + assignments_vars[doctor, day + 1, 0]
+    #                     + assignments_vars[doctor, day + 1, 1]
+    #                     <= 1,
+    #                     f"no_consecutive_{doctor}_{day}_night_{day + 1}_",
+    #                 )
 
     return
 
@@ -179,7 +209,7 @@ def build_luck_worker_constraint(
     assignment_vars: tupledict,
     helping_vars: tupledict,
     department_doctors: Tuple[str, List[str]],
-    mode: str = "luckiest", # luckiest or unluckiest
+    mode: str = "luckiest",  # luckiest or unluckiest
 ):
     """Build a constraint that forces the helping variables to be greater than the sum of the shifts of the doctors in the department that works the most
 
@@ -196,7 +226,7 @@ def build_luck_worker_constraint(
                 helping_vars[department] <= assignment_vars.sum(doctor, "*", "*"),
                 name=f"luckiest_worker_{department}_{doctor}",
             )
-        elif mode == "unluckiest":  
+        elif mode == "unluckiest":
             model.addConstr(
                 helping_vars[department] >= assignment_vars.sum(doctor, "*", "*"),
                 name=f"unlucky_worker_{department}_{doctor}",
