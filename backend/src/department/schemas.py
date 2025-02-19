@@ -1,10 +1,11 @@
 from pydantic import BaseModel, Field
 from typing import List, Tuple
 
-class NewDepartment(BaseModel):
+
+class UpdateDepartment(BaseModel):
     name: str
     description: str
-    type: str  = Field(
+    type: str = Field(
         ...,
         title="Type",
         description="Department type (low, medium, high)",
@@ -17,6 +18,9 @@ class NewDepartment(BaseModel):
         description="List of constraints",
         examples=[("monday", "shift-id"), ("tuesday", "shift-id")],
     )
+
+
+class NewDepartment(UpdateDepartment):
     specialization: str = Field(
         None,
         title="Specialization",

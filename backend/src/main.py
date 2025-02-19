@@ -65,7 +65,6 @@ app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(specialization_router)
 app.include_router(departments_router)
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Your frontend URL

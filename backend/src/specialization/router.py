@@ -35,11 +35,8 @@ async def create_specialization(
     database: db_client,
     user: Annotated[UserInDB, Depends(get_current_user)],
 ):
-    # if "admin" not in user.roles:
-    #     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-
-    specialization = Specialization(**specialization.model_dump())
-    await database.create_specialization(specialization, user)
+    new_specialization = Specialization(admins=[user.id], **specialization.model_dump())
+    await database.create_specialization(new_specialization, user)
     return specialization
 
 
@@ -65,21 +62,18 @@ async def get_specialization_users(
     return specialization_users
 
 
-@router.post("/{specialization_id}/assign/{user_id}")
+@router.post("/{specialization_id}/user/{user_email}")
 async def assign_specialization(
     specialization_id: str,
-    user_id: str,
+    user_email: str,
     database: db_client,
     user: Annotated[UserInDB, Depends(get_current_user)],
 ):
-    # if "admin" not in user.roles:
-    #     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-
     specialization = await database.get_specialization(specialization_id)
-    # if user.id not in specialization.admins:
-    #     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    if user.id not in specialization.admins:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
-    assign_user = await database.get_user(user_id)
+    assign_user = await database.get_user(user_email)
     if not assign_user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
