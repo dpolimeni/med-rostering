@@ -34,8 +34,14 @@ export default function Specializations() {
       
       try {
         // First, fetch the list of user's specialization IDs
-        console.log(specId);
-        
+        console.log("SPECIALIZATION ID", specId);
+
+        // If the specId is null or empty, return early
+        if (!specId) {
+          setIsLoading(false);
+          return;
+        }
+
         // Then fetch detailed information for the specialization
         const detailedSpecialization = await api.get(`/specializations/${specId}`, {
             headers: { Authorization: `Bearer ${token}` }
