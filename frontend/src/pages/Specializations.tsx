@@ -9,7 +9,7 @@ interface Specialization {
   id: string;
   name: string;
   description?: string;
-  shifs: Record<string, { start: string; end: string }>;
+  shifts: Record<string, { start: string; end: string }>;
 }
 
 export default function Specializations() {
@@ -18,7 +18,7 @@ export default function Specializations() {
   const [newSpecialization, setNewSpecialization] = useState({ 
     name: '', 
     description: '', 
-    shifs: {} as Record<string, { start: string; end: string }> 
+    shifts: {} as Record<string, { start: string; end: string }> 
   });
   const [isCreating, setIsCreating] = useState(false);
   const [shiftKey, setShiftKey] = useState('');
@@ -51,8 +51,8 @@ export default function Specializations() {
     if (shiftKey && shiftStartTime && shiftEndTime) {
       setNewSpecialization((prev) => ({
         ...prev,
-        shifs: { 
-          ...prev.shifs, 
+        shifts: { 
+          ...prev.shifts, 
           [shiftKey]: { 
             start: shiftStartTime, 
             end: shiftEndTime 
@@ -76,7 +76,7 @@ export default function Specializations() {
       setNewSpecialization({ 
         name: '', 
         description: '', 
-        shifs: {} 
+        shifts: {} 
       });
       setIsCreating(false);
     } catch (error) {
@@ -160,7 +160,7 @@ export default function Specializations() {
                 </button>
               </div>
               <ul className="mt-2">
-                {Object.entries(newSpecialization.shifs).map(([key, timeWindow]) => (
+                {Object.entries(newSpecialization.shifts).map(([key, timeWindow]) => (
                   <li key={key} className="text-gray-600">
                     {key}: {formatTimeDisplay(timeWindow)}
                   </li>
@@ -191,11 +191,11 @@ export default function Specializations() {
           <div key={spec.id} className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-lg font-semibold text-gray-900">{spec.name}</h3>
             {spec.description && <p className="mt-2 text-gray-600">{spec.description}</p>}
-            {spec.shifs && (
+            {spec.shifts && (
               <div className="mt-4">
                 <h4 className="font-medium text-gray-700">Shifts:</h4>
                 <ul className="mt-2 text-gray-600">
-                  {Object.entries(spec.shifs).map(([key, timeWindow]) => (
+                  {Object.entries(spec.shifts).map(([key, timeWindow]) => (
                     <li key={key} className="py-1">
                       <span className="font-medium">{key}:</span> {' '}
                       {typeof timeWindow === 'string' 
