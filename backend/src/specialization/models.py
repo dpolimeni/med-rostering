@@ -19,6 +19,12 @@ class Specialization(BaseModel):
         description="List of Departments id",
         examples=["ID_ginecology", "ID_surgery"],
     )
+    admins: List[str] = Field(
+        [],
+        title="Admins",
+        description="List of Owners id",
+        examples=["ID_admin1", "ID_admin2"],
+    )
     low_workload_departments: List[str] = []
     shifts: Dict[str, Shift] = Field(
         ...,
