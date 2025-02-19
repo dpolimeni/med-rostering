@@ -38,6 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           };
           setUserData(transformedUserData);
           console.log("USER DATA", transformedUserData);
+          localStorage.setItem('user_email', response.data.email);
         } catch (error) {
           console.error('Failed to fetch user data:', error);
           logout();
