@@ -43,9 +43,19 @@ class BaseDatabase(ABC):
         pass
 
     @abstractmethod
+    async def update_specialization(self, specialization: Specialization):
+        pass
+
+    @abstractmethod
     async def get_department(self, department_id: str):
         pass
 
     @abstractmethod
-    async def create_department(self, department: Department):
+    async def create_department(
+        self, department: Department, specialization: Specialization
+    ):
+        pass
+
+    @abstractmethod
+    async def update_department(self, department: Department):
         pass

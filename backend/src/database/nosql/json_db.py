@@ -65,12 +65,11 @@ class JsonDatabase(BaseDatabase):
             new_db = []
             for user in self.user_client:
                 if user["email"] == updated_user.email:
-                    user["hashed_password"] = updated_user.hashed_password
-                    new_db.append(user)
+                    new_db.append(updated_user.model_dump())
                 else:
                     new_db.append(user)
             with open(self._users_collection, "w") as f:
-                json.dump(self.user_client, f)
+                json.dump(new_db, f)
 
     async def verify_user(self, user_mail: str):
         if self.user_client:
@@ -97,28 +96,50 @@ class JsonDatabase(BaseDatabase):
             with open(self._specialization_collection, "w") as f:
                 json.dump(self.specialization_client, f)
 
-        if self.user_client is not None:
-            new_db = []
-            for db_user in self.user_client:
-                if db_user["id"] == user.id:
-                    db_user["specialization"] = specialization.id
-                new_db.append(db_user)
-            self.user_client = new_db
-            with open(self._users_collection, "w") as f:
-                json.dump(self.user_client, f)
+            user.specialization = specialization.id
+            await self.update_user(user)
 
         return
 
-    async def get_department(self, department_id: str):
+    async def update_specialization(self, specialization: Specialization):
+        if self.specialization_client:
+            new_db = []
+            for spec in self.specialization_client:
+                if spec["id"] == specialization.id:
+                    new_db.append(specialization.model_dump())
+                else:
+                    new_db.append(spec)
+            with open(self._specialization_collection, "w") as f:
+                json.dump(new_db, f)
+        return
+
+    async def get_department(self, department_id: str) -> Department:
         if self.department_client:
             for department in self.department_client:
                 if department["id"] == department_id:
                     return Department(**department)
         return None
 
-    async def create_department(self, department: Department):
+    async def create_department(
+        self, department: Department, specialization: Specialization
+    ):
         if self.department_client is not None:
             self.department_client.append(department.model_dump())
             with open(self._department_collection, "w") as f:
                 json.dump(self.department_client, f)
+
+            await self.update_specialization(specialization)
+
+        return
+
+    async def update_department(self, department: Department):
+        if self.department_client:
+            new_db = []
+            for dep in self.department_client:
+                if dep["id"] == department.id:
+                    new_db.append(department.model_dump())
+                else:
+                    new_db.append(dep)
+            with open(self._department_collection, "w") as f:
+                json.dump(new_db, f)
         return
