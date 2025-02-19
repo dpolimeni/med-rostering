@@ -1,23 +1,9 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import axios from 'axios';
 import api from '../api';
+import { UserData, Specialization } from '../types';
 
 api.defaults.baseURL = 'http://localhost:8000';
-
-interface UserData {
-  specializations: Specialization[];
-  departments: Department[];
-}
-
-interface Specialization {
-  id: string;
-  name: string;
-}
-
-interface Department {
-  id: string;
-  name: string;
-}
 
 interface AuthContextType {
   token: string | null;
@@ -40,7 +26,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const response = await api.get('/users/me', {
             headers: { Authorization: `Bearer ${token}` }
           });
-          setUserData(response.data);
+          console.log("RESPONSE", response.data);
+          
+          const transformedUserData: UserData = {
+            id: response.data.id,
+            email: response.data.email,
+            // You'll need to fetch the actual Specialization object using this ID
+            // or modify your interface to accept the ID directly
+            specialization: { id: response.data.specialization } as Specialization,
+            departmentId: response.data.department || '', // Handle null department
+          };
+          setUserData(transformedUserData);
+          console.log("USER DATA", transformedUserData);
         } catch (error) {
           console.error('Failed to fetch user data:', error);
           logout();

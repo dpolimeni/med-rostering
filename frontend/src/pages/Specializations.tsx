@@ -2,19 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Plus } from 'lucide-react';
 import api from '../api';
+import { UserData, Specialization, Department} from '../types';
 
 api.defaults.baseURL = 'http://localhost:8000';
 
-interface Specialization {
-  id: string;
-  name: string;
-  description?: string;
-  shifts: Record<string, { start: string; end: string }>;
-}
+interface SpecializationData {
+    specializations: Specialization[];
+  }
 
 export default function Specializations() {
   const { token, userData } = useAuth();
-  const [specializations, setSpecializations] = useState<Specialization[]>([]);
+  const [stateData, setStateData] = useState<SpecializationData>({
+    specializations: []
+  });
   const [newSpecialization, setNewSpecialization] = useState({ 
     name: '', 
     description: '', 
@@ -24,28 +24,44 @@ export default function Specializations() {
   const [shiftKey, setShiftKey] = useState('');
   const [shiftStartTime, setShiftStartTime] = useState('');
   const [shiftEndTime, setShiftEndTime] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchSpecializations = async () => {
-      if (userData?.specializations) {
-        try {
-          const detailedSpecializations = await Promise.all(
-            userData.specializations.map(async (spec) => {
-              const response = await api.get(`/specializations/${spec.id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-              });
-              return response.data;
-            })
-          );
-          setSpecializations(detailedSpecializations);
-        } catch (error) {
-          console.error('Failed to fetch specializations:', error);
-        }
+    const fetchSpecialization = async (specId: string) => {
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        // First, fetch the list of user's specialization IDs
+        console.log(specId);
+        
+        // Then fetch detailed information for the specialization
+        const detailedSpecialization = await api.get(`/specializations/${specId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+            });
+        console.log("DETAILED SPECIALIZATION", detailedSpecialization);
+        
+        setStateData(prevState => ({
+          ...prevState,
+          specializations: [detailedSpecialization.data]
+        }));
+        
+      } catch (error) {
+        console.error('Failed to fetch specializations:', error);
+        setError('Failed to load specializations. Please try again later.');
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchSpecializations();
-  }, [userData, token]);
+    if (token && userData && userData.specialization) {
+        console.log("USER DATA IN SPEC", userData);
+        fetchSpecialization(userData.specialization.id);
+    } else {
+        setIsLoading(false);
+    }
+  }, [token, userData]);
 
   const handleAddShift = () => {
     if (shiftKey && shiftStartTime && shiftEndTime) {
@@ -68,11 +84,19 @@ export default function Specializations() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      console.log(token);
       const response = await api.post('/specializations/create', newSpecialization, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setSpecializations([...specializations, response.data]);
+      
+      // Append stateData with the new specialization
+      setStateData(prevState => ({
+        ...prevState,
+        specializations: [
+          ...(prevState.specializations || []),
+          response.data
+        ]
+      }));
+    
       setNewSpecialization({ 
         name: '', 
         description: '', 
@@ -81,12 +105,31 @@ export default function Specializations() {
       setIsCreating(false);
     } catch (error) {
       console.error('Failed to create specialization:', error);
+      setError('Failed to create specialization. Please try again.');
     }
   };
 
   const formatTimeDisplay = (shift: { start: string; end: string }) => {
     return `${shift.start} - ${shift.end}`;
   };
+
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-64">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+    </div>;
+  }
+
+  if (error) {
+    return <div className="p-4 bg-red-50 text-red-700 rounded-md">
+      <p>{error}</p>
+      <button 
+        onClick={() => window.location.reload()} 
+        className="mt-2 px-4 py-2 bg-red-100 text-red-800 rounded-md hover:bg-red-200"
+      >
+        Retry
+      </button>
+    </div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -186,30 +229,50 @@ export default function Specializations() {
         </form>
       )}
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {specializations.map((spec) => (
-          <div key={spec.id} className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold text-gray-900">{spec.name}</h3>
-            {spec.description && <p className="mt-2 text-gray-600">{spec.description}</p>}
-            {spec.shifts && (
-              <div className="mt-4">
-                <h4 className="font-medium text-gray-700">Shifts:</h4>
-                <ul className="mt-2 text-gray-600">
-                  {Object.entries(spec.shifts).map(([key, timeWindow]) => (
-                    <li key={key} className="py-1">
-                      <span className="font-medium">{key}:</span> {' '}
-                      {typeof timeWindow === 'string' 
-                        ? timeWindow // Handle old format
-                        : formatTimeDisplay(timeWindow) // Handle new format
-                      }
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+      {stateData.specializations.length === 0 ? (
+        <div className="bg-gray-50 p-8 rounded-lg text-center">
+          <p className="text-gray-600">No specializations found. Create your first one!</p>
+        </div>
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {stateData.specializations.map((spec) => (
+            <div key={spec.id} className="bg-white p-6 rounded-lg shadow-md">
+              <dl className="space-y-4">
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">Name:</dt>
+                  <dd className="text-lg font-semibold text-gray-900">{spec.name}</dd>
+                </div>
+                
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">Description:</dt>
+                  <dd className="text-gray-600">{spec.description || "No description provided"}</dd>
+                </div>
+                
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">Shifts:</dt>
+                  <dd>
+                    {spec.shifts && Object.entries(spec.shifts).length > 0 ? (
+                      <ul className="mt-1 space-y-1">
+                        {Object.entries(spec.shifts).map(([key, timeWindow]) => (
+                          <li key={key} className="text-gray-600">
+                            <span className="font-medium">{key}:</span> {' '}
+                            {typeof timeWindow === 'string' 
+                              ? timeWindow 
+                              : formatTimeDisplay(timeWindow)
+                            }
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <span className="text-gray-500 italic">No shifts defined</span>
+                    )}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
