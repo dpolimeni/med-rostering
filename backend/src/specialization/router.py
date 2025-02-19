@@ -38,5 +38,5 @@ async def create_specialization(
     #     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
     specialization = Specialization(**specialization.model_dump())
-    await database.create_specialization(specialization)
+    await database.create_specialization(specialization, user)
     return specialization

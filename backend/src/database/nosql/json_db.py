@@ -89,11 +89,24 @@ class JsonDatabase(BaseDatabase):
                     return Specialization(**specialization)
         return None
 
-    async def create_specialization(self, specialization: Specialization):
+    async def create_specialization(
+        self, specialization: Specialization, user: UserInDB
+    ):
         if self.specialization_client is not None:
             self.specialization_client.append(specialization.model_dump())
             with open(self._specialization_collection, "w") as f:
                 json.dump(self.specialization_client, f)
+
+        if self.user_client is not None:
+            new_db = []
+            for db_user in self.user_client:
+                if db_user["id"] == user.id:
+                    db_user["specialization"] = specialization.id
+                new_db.append(db_user)
+            self.user_client = new_db
+            with open(self._users_collection, "w") as f:
+                json.dump(self.user_client, f)
+
         return
 
     async def get_department(self, department_id: str):

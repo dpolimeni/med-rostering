@@ -31,13 +31,21 @@ class BaseDatabase(ABC):
         pass
 
     @abstractmethod
-    async def create_specialization(self, specialization: Specialization):
+    async def create_specialization(
+        self, specialization: Specialization, user: UserInDB
+    ):
+        """Create a new specialization and add its id to the user collection.
+
+        Args:
+            specialization (Specialization): Specialization Db object
+            user (UserInDB): User Db object
+        """
         pass
 
     @abstractmethod
     async def get_department(self, department_id: str):
         pass
-    
+
     @abstractmethod
     async def create_department(self, department: Department):
         pass
