@@ -22,7 +22,7 @@ async def get_specialization(
     if not specialization:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-    if user.department not in specialization.departments:
+    if user.specialization not in specialization.id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
     return specialization
