@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from uuid import uuid4
 from typing import Dict, List
+from .schemas import Shift
 
 
 class Specialization(BaseModel):
@@ -19,9 +20,9 @@ class Specialization(BaseModel):
         examples=["ID_ginecology", "ID_surgery"],
     )
     low_workload_departments: List[str] = []
-    shifs: Dict[str, str] = Field(
+    shifts: Dict[str, Shift] = Field(
         ...,
         title="Shifs",
         description="Shifs",
-        examples=[{"morning": "8:00-16:00"}, {"night": "20:00-4:00"}],
+        examples=[{"morning": {"start": "8:00", "end": "16:00"}}],
     )

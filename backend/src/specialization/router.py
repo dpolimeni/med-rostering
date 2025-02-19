@@ -34,8 +34,8 @@ async def create_specialization(
     database: db_client,
     user: Annotated[UserInDB, Depends(get_current_user)],
 ):
-    if "admin" not in user.roles:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    # if "admin" not in user.roles:
+    #     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
     specialization = Specialization(**specialization.model_dump())
     await database.create_specialization(specialization)

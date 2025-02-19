@@ -91,7 +91,7 @@ class TokenManager:
         access_token = self._generate_token(
             user_data=user_data,
             token_type="access",
-            expires_delta=timedelta(seconds=self.access_token_expire_minutes),
+            expires_delta=timedelta(minutes=self.access_token_expire_minutes),
             secret_key=self.token_secret,
         )
 
